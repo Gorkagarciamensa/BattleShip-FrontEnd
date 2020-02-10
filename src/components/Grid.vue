@@ -13,132 +13,68 @@
         <div v-else>Waiting for opponent...</div>
       </div>
     </div>
+    <div class="flexJustify">
+      <div v-for="(type, i) in this.shipsToSend" :key="i" :id="type.type + 'sink'">{{type.type}}</div>
+    </div>
     <h4>My Ships</h4>
 
     <div>
       <button @click="sendShips">Send Ships</button>
     </div>
-    <div>
-      <div v-if="shipOrientations['Carrier']">
-        <img
-          id="Carrier"
-          @dragstart="dragStart"
-          @dragover.stop
-          data-ship-length="5"
-          data-ship-type="Carrier"
-          src="../assets/carrier.png"
-          class="horImg"
-          @click="drawShip($event, 'Carrier')"
-        />
-      </div>
-      <div v-else>
-        <img
-          src="../assets/carrier_ver.png"
-          id="CarrierVer"
-          @dragstart="dragStart"
-          @dragover.stop
-          data-ship-length="5"
-          data-ship-type="Carrier"
-          class="verImg"
-          @click="drawShip($event, 'Carrier')"
-        />
-      </div>
-      <div v-if="shipOrientations['Destroyer']">
-        <img
-          id="Destroyer"
-          @dragstart="dragStart"
-          @dragover.stop
-          data-ship-length="3"
-          data-ship-type="Destroyer"
-          src="../assets/carrier.png"
-          class="horImg"
-          @click="drawShip($event, 'Destroyer')"
-        />
-      </div>
-      <div v-else>
-        <img
-          id="DestroyerVer"
-          @dragstart="dragStart"
-          @dragover.stop
-          data-ship-length="3"
-          data-ship-type="Destroyer"
-          src="../assets/carrier_ver.png"
-          class="verImg"
-          @click="drawShip($event, 'Destroyer')"
-        />
-      </div>
-      <div v-if="shipOrientations['Submarine']">
-        <img
-          id="Submarine"
-          @dragstart="dragStart"
-          @dragover.stop
-          data-ship-length="3"
-          data-ship-type="Submarine"
-          src="../assets/carrier.png"
-          class="horImg"
-          @click="drawShip($event, 'Submarine')"
-        />
-      </div>
-      <div v-else>
-        <img
-          id="SubmarineVer"
-          @dragstart="dragStart"
-          @dragover.stop
-          data-ship-length="3"
-          data-ship-type="Submarine"
-          src="../assets/carrier_ver.png"
-          class="verImg"
-          @click="drawShip($event, 'Submarine')"
-        />
-      </div>
-      <div v-if="shipOrientations['PatrolBoat']">
-        <img
-          id="PatrolBoat"
-          @dragstart="dragStart"
-          @dragover.stop
-          data-ship-length="2"
-          data-ship-type="PatrolBoat"
-          src="../assets/carrier.png"
-          class="horImg"
-          @click="drawShip($event, 'PatrolBoat')"
-        />
-      </div>
-      <div v-else>
-        <img
-          id="PatrolBoatVer"
-          @dragstart="dragStart"
-          @dragover.stop
-          data-ship-length="2"
-          data-ship-type="PatrolBoat"
-          src="../assets/carrier_ver.png"
-          class="verImg"
-          @click="drawShip($event, 'PatrolBoat')"
-        />
-      </div>
-      <div v-if="shipOrientations['Battleship']">
-        <img
-          id="Battleship"
-          @dragstart="dragStart"
-          @dragover.stop
-          data-ship-length="4"
-          data-ship-type="Battleship"
-          src="../assets/carrier.png"
-          class="horImg"
-          @click="drawShip($event, 'Battleship')"
-        />
-      </div>
-      <div v-else>
-        <img
-          id="BattleshipVer"
-          @dragstart="dragStart"
-          @dragover.stop
-          data-ship-length="4"
-          data-ship-type="Battleship"
-          src="../assets/carrier_ver.png"
-          class="verImg"
-          @click="drawShip($event, 'Battleship')"
-        />
-      </div>
+    <div class="flexJustify">
+      <div
+        :class="shipOrientations['Carrier'] ? 'carrierImg' : 'verCarrierImg'"
+        id="Carrier"
+        :draggable="true"
+        @dragstart="dragStart"
+        @dragover.stop
+        data-ship-length="5"
+        data-ship-type="Carrier"
+        @click="turnShip($event, 'Carrier')"
+      >Carrier</div>
+      <div
+        :class="shipOrientations['Destroyer'] ? 'destroyerImg' : 'verDestroyerImg'"
+        id="Destroyer"
+        :draggable="true"
+        @dragstart="dragStart"
+        @dragover.stop
+        data-ship-length="3"
+        data-ship-type="Destroyer"
+        @click="turnShip($event, 'Destroyer')"
+      >Destroyer</div>
+
+      <div
+        id="Submarine"
+        :class="shipOrientations['Submarine'] ? 'submarineImg' : 'verSubmarineImg'"
+        :draggable="true"
+        @dragstart="dragStart"
+        @dragover.stop
+        data-ship-length="3"
+        data-ship-type="Submarine"
+        @click="turnShip($event, 'Submarine')"
+      >Submarine</div>
+
+      <div
+        :class="shipOrientations['PatrolBoat'] ? 'patrolBoatImg' : 'verPatrolBoatImg'"
+        :draggable="true"
+        id="PatrolBoat"
+        @dragstart="dragStart"
+        @dragover.stop
+        data-ship-length="2"
+        data-ship-type="PatrolBoat"
+        @click="turnShip($event, 'PatrolBoat')"
+      >Patrol Boat</div>
+
+      <div
+        :class="shipOrientations['Battleship'] ? 'battleshipImg' : 'verBattleshipImg'"
+        id="Battleship"
+        :draggable="true"
+        @dragstart="dragStart"
+        @dragover.stop
+        data-ship-length="4"
+        data-ship-type="Battleship"
+        @click="turnShip($event, 'Battleship')"
+      >Battleship</div>
     </div>
     <div>
       <div class="inline-block">
@@ -161,6 +97,7 @@
 
       <div>
         <h4>Shots</h4>
+        <button @click="sendSalvos">Shot!</button>
         <div class="flex-grid">
           <div v-for="num in rows" :key="num" class="grid-colum">{{num}}</div>
         </div>
@@ -182,7 +119,6 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import Drop from "./Drop";
 
 export default {
   //submarine is 3
@@ -191,16 +127,16 @@ export default {
   //patrol boat is 2
   //carrier is 5
   props: ["gpId", "id"],
-  components: {
-    Drop
-  },
+  components: {},
   data() {
     return {
-      counter: null,
+      counter: 0,
       myLocations: [],
       opponentLoc: [],
+      myShots: [],
       rows: ["", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       cols: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
+      salvosToSend: [],
       shipsToSend: [
         {
           type: "Destroyer",
@@ -223,17 +159,7 @@ export default {
           location: []
         }
       ],
-
       //make all variables from drop function to general
-      dataTarget: [],
-      dataShipId: [],
-      dataShip: [],
-      dataRegEx: [],
-      dataNumRegex: [],
-      dataLetRegex: [],
-      dataNewShipLoc: [],
-
-      removeColorCells: [],
       shipOrientations: {
         Carrier: true,
         Destroyer: true,
@@ -259,20 +185,34 @@ export default {
           }
         }
 
-        //my shots
+        //my shots && hits done
+
         for (let i = 0; i < this.getGameView.mySalvo.length; i++) {
           let mySalvo = this.getGameView.mySalvo[i].Location;
 
           for (let j = 0; j < mySalvo.length; j++) {
             document.getElementById(mySalvo[j] + "s").classList.add("myShots");
           }
+
+          for (let j = 0; j < this.getGameView.hits.length; j++) {
+            let counter = 1 + j;
+
+            let hits = this.getGameView.hits[j][counter];
+
+            hits.forEach(hit => {
+              document.getElementById(hit + "s").classList.add("hits");
+
+              //for each hit done, add that class
+            });
+          }
         }
         //opponent shots
-        for (let k = 0; k < this.getGameView.length; k++) {
+
+        for (let k = 0; k < this.getGameView.oppSalvo.length; k++) {
           let oppSalvo = this.getGameView.oppSalvo[k].Location;
 
           for (let j = 0; j < oppSalvo.length; j++) {
-            document.getElementById(oppSalvo[j]).style.background = "pink";
+            document.getElementById(oppSalvo[j]).classList.add("oppShots");
             this.opponentLoc.push(oppSalvo[j]);
           }
         }
@@ -281,8 +221,23 @@ export default {
         for (let i = 0; i < this.myLocations.length; i++) {
           for (let j = 0; j < this.opponentLoc.length; j++) {
             if (this.myLocations[i] == this.opponentLoc[j]) {
-              document.getElementById(this.opponentLoc[j]).style.background =
-                "black";
+              document
+                .getElementById(this.opponentLoc[j])
+                .classList.add("hits");
+            }
+          }
+        }
+
+        //cross out ship name if the ship is sunk
+        for (let i = 0; i < this.getGameView.sunkShips.sunk.length; i++) {
+          let sunk = this.getGameView.sunkShips.sunk[i].replace(/\s/g, "");
+
+          let keys = Object.keys(this.shipOrientations);
+          for (let j = 0; j < keys.length; j++) {
+            let ships = keys[j];
+
+            if (sunk == ships) {
+              document.getElementById(sunk + "sink").classList.add("crossOut");
             }
           }
         }
@@ -290,7 +245,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["actShips"]),
+    ...mapActions(["actShips", "actSalvos"]),
     sendShips() {
       return this.$store.dispatch("actShips", {
         gpId: this.gpId,
@@ -298,248 +253,186 @@ export default {
       });
     },
 
+    sendSalvos() {
+      return this.$store.dispatch("actSalvos", {
+        gpId: this.gpId,
+        salvos: this.salvosToSend
+      });
+    },
+
     //drag and drop
     dragStart(e) {
       console.log("dragstart");
-
       let target = e.target;
-      this.counter = 0;
       e.dataTransfer.setData("ship_id", target.id);
+
+      this.counter = 0;
     },
     drop(e) {
       console.log("drop");
 
-      let ship_id = e.dataTransfer.getData("ship_id"); //we transfer the data to the drop event
-      console.log("ship_id: ", ship_id);
+      let grid = e.target;
+      let shipId = e.dataTransfer.getData("ship_id"); //Carrier, Destroyer...
+      let ship = document.getElementById(shipId);
 
-      this.dataShip = document.getElementById(ship_id);
-      console.log("dataShip", this.dataShip);
-
-      this.dataTarget = e.target;
-      console.log("dataTarget", this.dataTarget);
-
-      console.log("dataTarget ID", this.dataTarget.id);
-
-      let regexStr = this.dataTarget.id;
-      console.log("regexStr:", regexStr);
-      this.dataRegEx = regexStr;
-
-      let numRegex = Number(regexStr[1]);
-      console.log("numRegex:", numRegex);
-
-      let letRegex = regexStr[0];
-      console.log("letRegex", letRegex);
-
-      //assign values to the general variables
-      this.dataShipId = ship_id;
-      console.log("dataShipId:", this.dataShipId);
-
-      this.dataNumRegex = numRegex;
-      console.log("dataNumRegex", this.dataNumRegex);
-
-      this.dataLetRegex = letRegex;
-      console.log("dataLetRegex", this.dataLetRegex);
-
-      this.conditionFunction();
+      // this.shipsToSend.forEach(ship => {
+      //   if (ship.type == shipId) {
+      //     ship.location = [];
+      //   }
+      // });
+      if (this.checkFree(shipId, grid)) {
+        this.shipConditions(shipId, grid);
+      } else {
+        console.log("can't drop here");
+      }
     },
+    turnShip(event, name) {
+      this.counter = 1;
+      let grid = event.target.offsetParent;
+      let gridId = event.target.offsetParent.id; //A5
+      let shipId = event.target.id; //CARRIER
+      let ship = document.getElementById(shipId);
+      let shipLen = ship.dataset.shipLength;
 
-    conditionFunction() {
-      console.log("condition function", this.dataTarget);
-      console.log("cond id", this.dataTarget.id);
-      console.log("cond length", this.dataTarget.id.length);
+      let num = Number(gridId.substring(1));
+      let char = gridId.substring(0, 1);
 
+      console.log("draw");
       if (
-        (this.checkFree(this.dataShip) &&
-        this.dataTarget.id.length != 1 && //horizontal
-          Number(this.dataShip.dataset.shipLength) + this.dataNumRegex < 12 &&
-          this.shipOrientations[this.dataShip.dataset.shipType]) ||
-        (this.checkFree(this.dataShip) &&
-        this.dataTarget.id.length != 1 && //vertical
-          Number(this.dataShip.dataset.shipLength) +
-            this.dataLetRegex.charCodeAt(0) <
-            76 &&
-          !this.shipOrientations[this.dataShip.dataset.shipType])
+        (Number(shipLen) + num < 12 && !this.shipOrientations[name]) ||
+        (Number(shipLen) + char.charCodeAt(0) < 76 &&
+          this.shipOrientations[name])
       ) {
-        this.dataShip.style.position = "absolute";
-        this.dataShip.style.display = "block";
-        this.dataTarget.appendChild(this.dataShip);
-
-        this.orientationShip();
+        this.shipOrientations[name] = !this.shipOrientations[name];
+        if (this.checkFree(shipId, grid)) {
+          this.shipConditions(shipId, grid);
+        } else {
+          this.shipOrientations[name] = !this.shipOrientations[name];
+          console.log("can't turn here");
+        }
       } else {
-        console.log("drop(e) not allowed");
+        console.log("can't turn around here");
       }
     },
-    checkFree(ship) {
-      console.log("check");
+    shipLocation(shipId, grid) {
+      console.log("location");
 
-      let sepuede = true;
+      let ship = document.getElementById(shipId);
 
-      if (this.shipOrientations[ship.dataset.shipType]) {
-        console.log("horizontal(checkfree)", this.counter);
-        for (let i = this.counter; i < ship.dataset.shipLength; i++) {
-          if (
-            document.getElementById(
-              this.dataRegEx[0] + (Number(this.dataRegEx[1]) + i)
-            ).classList.length > 1
-          ) {
-            console.log("sorry can't put a ship");
-            sepuede = false;
-          }
-        }
-      } else {
-        console.log("vertical(checkfree)", this.counter);
+      let char = grid.id.substring(0, 1); //this is A from A10
+      let num = Number(grid.id.substring(1)); //this is 10 from A10
 
-        for (let i = this.counter; i < ship.dataset.shipLength; i++) {
-          if (
-            document.getElementById(
-              String.fromCharCode(this.dataRegEx[0].charCodeAt(0) + i) +
-                this.dataRegEx[1]
-            ).classList.length > 1
-          ) {
-            console.log("sorry can't put a ship");
-            sepuede = false;
-          }
-        }
-      }
-      return sepuede;
-    },
-    //orientation (vertical/horizontal)
-    orientationShip(event) {
-      console.log("orientation");
-
-      let newShipLocations = [];
-
-      this.dataNewShipLoc = newShipLocations;
-      console.log(this.dataNewShipLoc);
-
-      let ship = this.dataShip;
-      console.log(ship);
-
-      this.removeShips();
-      console.log("orientation letter", this.dataLetRegex);
-      console.log("orientation num", this.dataNumRegex);
-      console.log(this.dataRegEx);
-      let regEx = this.dataRegEx;
-      let letReg = this.dataRegEx.match(/[a-z]+|[^a-z]+/gi);
-      console.log(letReg[1]);
-
-      //horizontal
+      let newShipLoc = [];
 
       if (this.shipOrientations[ship.dataset.shipType]) {
-        if (Number(ship.dataset.shipLength) + this.dataNumRegex < 12) {
-          for (let i = 0; i < ship.dataset.shipLength; i++) {
-            newShipLocations.push(this.dataLetRegex + (this.dataNumRegex + i));
-
-            document
-              .getElementById(this.dataLetRegex + (this.dataNumRegex + i))
-              .classList.add(ship.dataset.shipType);
-          }
-        } else {
-          console.log("can't place a ship there!");
+        console.log("orientation horizontal");
+        for (let i = 0; i < ship.dataset.shipLength; i++) {
+          newShipLoc.push(char + (num + i));
         }
-
-        //Vertical position
       } else {
-        if (
-          Number(ship.dataset.shipLength) + this.dataLetRegex.charCodeAt(0) <
-          76
-        ) {
-          for (let i = 0; i < ship.dataset.shipLength; i++) {
-            console.log("en el for num", this.dataNumRegex);
-            console.log(
-              "en el for letra",
-              String.fromCharCode(this.dataLetRegex.charCodeAt(0) + i)
-            );
-
-            newShipLocations.push(this.dataLetRegex.charCodeAt(0) + i);
-            console.log("locations", newShipLocations);
-            document
-              .getElementById(
-                String.fromCharCode(this.dataLetRegex.charCodeAt(0) + i) +
-                  Number(letReg[1])
-              )
-              .classList.add(ship.dataset.shipType);
-          }
-        } else {
-          console.log("can't place a ship vertically there!");
+        console.log("orientation vertical");
+        for (let i = 0; i < ship.dataset.shipLength; i++) {
+          newShipLoc.push(String.fromCharCode(char.charCodeAt(0) + i) + num);
         }
       }
-      this.shipsToSend.forEach(shipToSend => {
-        if (shipToSend.type == ship.dataset.shipType) {
-          shipToSend.location = newShipLocations;
+
+      this.shipsToSend.forEach(sendShip => {
+        if (sendShip.type == ship.dataset.shipType) {
+          sendShip.location = newShipLoc;
         }
       });
     },
+    shipConditions(shipId, grid) {
+      console.log("conditions");
 
-    drawShip(event, ship) {
-      this.counter = 1;
-      //this function happens when the ship is changed from vertical to horizontal
-      console.log("draw");
-      console.log("ship", this.dataNumRegex);
-      let regEx = this.dataRegEx;
-      let letReg = this.dataRegEx.match(/[a-z]+|[^a-z]+/gi);
-      this.dataTarget = event.target.offsetParent;
-      console.log(letReg[1]);
-      console.log(Number(this.dataShip.dataset.shipLength));
-      console.log(Number(this.dataShip.dataset.shipLength) + letReg[1]);
-      console.log(event.target.offsetParent.id);
+      let ship = document.getElementById(shipId);
+      let shipLen = ship.dataset.shipLength;
+      let shipType = ship.dataset.shipType;
+      let char = grid.id.substring(0, 1); //this is A from A10
+      let num = Number(grid.id.substring(1)); //this is 10 from A10
 
       if (
-        (Number(this.dataShip.dataset.shipLength) + Number(letReg[1]) < 12 &&
-          !this.shipOrientations[this.dataShip.dataset.shipType]) ||
-        (this.dataTarget.id.length != 1 &&
-          Number(this.dataShip.dataset.shipLength) +
-            this.dataLetRegex.charCodeAt(0) <
-            76 &&
-          this.shipOrientations[this.dataShip.dataset.shipType])
+        Number(shipLen) + num < 12 &&
+        num != 0 &&
+        this.shipOrientations[shipType]
       ) {
-        console.log(letReg[1]);
-
-        this.shipOrientations[ship] = !this.shipOrientations[ship];
-        this.dataShip = document.getElementById(event.target.id);
-        console.log("barco", this.dataShip);
-        console.log("event", event.target.id);
-        console.log("ship Ver or Hor", this.dataShip.id);
-        this.dataShipId = this.dataShip.id;
-        this.dataLetRegex = event.target.offsetParent.id.split("")[0];
-        console.log("event padre", event.target.offsetParent.id);
-        this.dataTarget = event.target.offsetParent;
-        console.log(this.dataTarget);
-
-        this.dataRegEx = event.target.offsetParent.id;
-        this.dataNumRegex = Number(
-          event.target.offsetParent.id.match(/[a-z]+|[^a-z]+/gi)[1]
-        );
-
-        if (this.checkFree(this.dataShip)) {
-          this.conditionFunction();
-        } else {
-          this.shipOrientations[ship] = !this.shipOrientations[ship];
-          console.log("can't turn around here!******");
-        }
+        ship.style.position = "absolute";
+        ship.style.display = "block";
+        grid.appendChild(ship);
+        this.shipLocation(shipId, grid);
+      } else if (
+        Number(shipLen) + char.charCodeAt(0) < 76 && //
+        num != 0 && //number is diff than 0 (this is for the lone letter in the grid, a.k.a A, B...)
+        !this.shipOrientations[shipType] //vertical
+      ) {
+        ship.style.position = "absolute";
+        ship.style.display = "block";
+        grid.appendChild(ship);
+        this.shipLocation(shipId, grid);
       } else {
-        console.log("can't turn around here! orientation");
+        console.log("can't place the ship there fucking cheater");
       }
     },
-    removeShips() {
-      //when changing a place from the grid to another, the background color is removed
-      let ship = this.dataShip;
+    checkFree(shipId, grid) {
+      let ship = document.getElementById(shipId);
+      let typeShip = ship.dataset.shipType;
+      let shipLen = ship.dataset.shipLength;
+      let char = grid.id.substring(0, 1); //this is A from A10
+      let num = Number(grid.id.substring(1)); //this is 10 from A10
+      let equalizer = true;
 
-      let shipColorCells = Array.from(
-        document.getElementsByClassName(ship.dataset.shipType)
-      );
-      this.removeColorCells = shipColorCells;
-      for (let i = 0; i < shipColorCells.length; i++) {
-        shipColorCells[i].classList.remove(ship.dataset.shipType);
+      for (let i = this.counter; i < shipLen; i++) {
+        if (this.shipOrientations[typeShip]) {
+          this.shipsToSend.forEach(shipSend => {
+            if (shipSend.location.includes(char + (num + i))) {
+              console.log("can't place");
+              equalizer = false;
+            }
+          });
+        } else {
+          this.shipsToSend.forEach(shipSend => {
+            if (
+              shipSend.location.includes(
+                String.fromCharCode(char.charCodeAt(0) + i) + num
+              )
+            ) {
+              console.log("can't place");
+              equalizer = false;
+            }
+          });
+        }
       }
+
+      return equalizer;
     },
 
     putSalvos(cell) {
-      document.getElementById(cell + "s").style.background = "cyan";
+      if (document.getElementById(cell + "s").id.length > 2) {
+        if (document.getElementById(cell + "s").classList.contains("myShots")) {
+          console.log("can't shot where you shotted!");
+        } else {
+          if (this.salvosToSend.includes(cell)) {
+            document.getElementById(cell + "s").classList.remove("shotsDone");
+            this.salvosToSend.splice(this.salvosToSend.indexOf(cell), 1);
+          } else {
+            if (this.salvosToSend.length < 5) {
+              document.getElementById(cell + "s").classList.add("shotsDone");
+              this.salvosToSend.push(cell);
+            } else {
+              console.log("can't put anymore ships");
+            }
+          }
+        }
+      } else {
+        console.log("can't shoot outside of the grid");
+      }
     }
   },
   computed: {
-    ...mapGetters(["getGameView", "getShips"])
+    ...mapGetters(["getGameView", "getShips"]),
+    changepos() {
+      return this.shipOrientations;
+    }
   },
   created() {}
 };
@@ -551,6 +444,10 @@ export default {
 }
 .flex-grid {
   display: flex;
+}
+.flexJustify {
+  display: flex;
+  justify-content: space-evenly;
 }
 .grid-colum {
   display: inline-grid;
@@ -570,7 +467,7 @@ export default {
   background-color: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(0, 0, 0, 0.8);
   padding: 10px;
-  text-align: center;
+
   width: 20px;
   position: relative;
 }
@@ -589,18 +486,90 @@ export default {
 .Battleship {
   background: brown;
 }
+.shotsDone {
+  background: cyan;
+}
 .myShots {
   background: rgb(0, 0, 0, 0.5);
 }
-.horImg {
+.oppShots {
+  background: rgb(126, 243, 126);
+}
+.oppHits {
+  background: rgb(255, 29, 161);
+}
+.hits {
+  background: purple;
+}
+.crossOut {
+  text-decoration: line-through;
+}
+.sunkShip {
+  background: black;
+}
+.carrierImg {
+  width: 208px;
+  height: 38px;
+  z-index: 1;
+  background-color: green;
+}
+.verCarrierImg {
+  z-index: 1;
+  height: 200px;
+  width: 40.5px;
+  background-color: green;
+  top: 0;
+}
+.destroyerImg {
   width: 124px;
   height: 38px;
   z-index: 1;
+  background-color: gray;
 }
-.verImg {
-  top: 0;
+.verDestroyerImg {
   z-index: 1;
-  height: 100px;
-  width: 42px;
+  height: 120px;
+  width: 40.5px;
+  background-color: gray;
+  top: 0;
+}
+.submarineImg {
+  width: 124px;
+  height: 38px;
+  z-index: 1;
+  background-color: yellow;
+}
+.verSubmarineImg {
+  z-index: 1;
+  height: 120px;
+  width: 40.5px;
+  background-color: yellow;
+  top: 0;
+}
+.patrolBoatImg {
+  width: 82px;
+  height: 38px;
+  z-index: 1;
+  background-color: orange;
+}
+.verPatrolBoatImg {
+  z-index: 1;
+  height: 80px;
+  width: 40.5px;
+  background-color: orange;
+  top: 0;
+}
+.battleshipImg {
+  width: 166px;
+  height: 38px;
+  z-index: 1;
+  background-color: cyan;
+}
+.verBattleshipImg {
+  z-index: 1;
+  height: 160px;
+  width: 40.5px;
+  background-color: cyan;
+  top: 0;
 }
 </style>

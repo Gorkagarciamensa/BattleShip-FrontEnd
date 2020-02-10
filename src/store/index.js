@@ -218,6 +218,36 @@ export default new Vuex.Store({
       })
         .then(newData => {
           console.log("data sent: ", JSON.stringify(newData));
+          console.log(ships);
+
+          return newData.json();
+        })
+        .then(data => {
+          if (data.Error) {
+            //data.Error references the backend
+            console.log("error ", data);
+          } else {
+            console.log("created: ", data);
+            dispatch("actGameView", gpId);
+          }
+        })
+        .catch(error => {
+          console.log("Request failure: ", error);
+        });
+    },
+    actSalvos({ commit, dispatch }, { gpId, salvos }) {
+      console.log(gpId, salvos);
+
+      fetch("/api/games/players/" + gpId + "/salvos", {
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify(salvos)
+      })
+        .then(newData => {
+          console.log("data sent: ", JSON.stringify(newData));
           return newData.json();
         })
         .then(data => {
