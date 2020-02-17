@@ -1,4 +1,3 @@
-
 <template>
   <div>
     <List></List>

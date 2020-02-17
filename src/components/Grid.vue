@@ -1,120 +1,197 @@
 <template>
-  <div v-if="getGameView.length !=0">
-    <router-link :to="'/'">
-      <button>Back to main page</button>
-    </router-link>
-    <div>
-      <div>
-        <div>{{getGameView.Game.gameplayers[0].player.username}}</div>
-        <span>VS</span>
-        <div
-          v-if="getGameView.Game.gameplayers.length > 1"
-        >{{getGameView.Game.gameplayers[1].player.username}}</div>
-        <div v-else>Waiting for opponent...</div>
-      </div>
-    </div>
-    <div class="flexJustify">
-      <div v-for="(type, i) in this.shipsToSend" :key="i" :id="type.type + 'sink'">{{type.type}}</div>
-    </div>
-    <h4>My Ships</h4>
+  <v-app class="bckImg">
+    <div v-if="getGameView.length != 0 && getGames" class="wholeHeight">
+      <v-toolbar dense class="text-center">
+        <v-btn icon>
+          <router-link :to="'/'">
+            <v-icon>fas fa-arrow-alt-circle-left</v-icon>
+          </router-link>
+        </v-btn>
 
-    <div>
-      <button @click="sendShips">Send Ships</button>
-    </div>
-    <div class="flexJustify">
-      <div
-        :class="shipOrientations['Carrier'] ? 'carrierImg' : 'verCarrierImg'"
-        id="Carrier"
-        :draggable="true"
-        @dragstart="dragStart"
-        @dragover.stop
-        data-ship-length="5"
-        data-ship-type="Carrier"
-        @click="turnShip($event, 'Carrier')"
-      >Carrier</div>
-      <div
-        :class="shipOrientations['Destroyer'] ? 'destroyerImg' : 'verDestroyerImg'"
-        id="Destroyer"
-        :draggable="true"
-        @dragstart="dragStart"
-        @dragover.stop
-        data-ship-length="3"
-        data-ship-type="Destroyer"
-        @click="turnShip($event, 'Destroyer')"
-      >Destroyer</div>
+        <v-toolbar-title>
+          <div>
+            <h4 class="text-capitalize">{{getGameView.State.Logic}}</h4>
+          </div>
+          <div>
+            <h4>Turn: {{getGameView.mySalvo.length}}</h4>
+          </div>
+        </v-toolbar-title>
+      </v-toolbar>
 
-      <div
-        id="Submarine"
-        :class="shipOrientations['Submarine'] ? 'submarineImg' : 'verSubmarineImg'"
-        :draggable="true"
-        @dragstart="dragStart"
-        @dragover.stop
-        data-ship-length="3"
-        data-ship-type="Submarine"
-        @click="turnShip($event, 'Submarine')"
-      >Submarine</div>
+      <v-bottom-navigation height="27px" class="navBck">
+        <div class="flexWidth">
+          <div class="flexPad">
+            <div class="youVsOpp">
+              <div class="white--text">{{ getGames.player.username }} (You)</div>
+              <div>VS</div>
+              <div
+                v-if="getGameView.Game.gameplayers.length > 1"
+              >{{ getGameView.Game.gameplayers[0].player.username }}</div>
+              <div v-else>Waiting for opponent...</div>
+            </div>
+          </div>
+        </div>
+      </v-bottom-navigation>
+      <v-dialog v-model="dialogDrop" hide-overlay persistent width="300">
+        <v-card color="primary" dark>
+          <v-card-text class="text-center px-1">Can't drop outside of the grid</v-card-text>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialogTurn" hide-overlay persistent width="300">
+        <v-card color="primary" dark>
+          <v-card-text class="text-center px-1">Can't turn here</v-card-text>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialogTurnOnShip" hide-overlay persistent width="300">
+        <v-card color="primary" dark>
+          <v-card-text class="text-center px-1">Jesus, do you want to collapse?</v-card-text>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialogSalvo" hide-overlay persistent width="300">
+        <v-card color="primary" dark>
+          <v-card-text class="text-center px-1">Can't shoot more than five times, greedy</v-card-text>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialogSalvoGrid" hide-overlay persistent width="300">
+        <v-card color="primary" dark>
+          <v-card-text class="text-center px-1">Where are you aiming? You can't shoot there!</v-card-text>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialogDrag" hide-overlay persistent width="300">
+        <v-card color="primary" dark>
+          <v-card-text class="text-center px-1">Can't drag after you sent the ships</v-card-text>
+        </v-card>
+      </v-dialog>
+      <!------------------------------my grid---------------------------------------------------->
 
-      <div
-        :class="shipOrientations['PatrolBoat'] ? 'patrolBoatImg' : 'verPatrolBoatImg'"
-        :draggable="true"
-        id="PatrolBoat"
-        @dragstart="dragStart"
-        @dragover.stop
-        data-ship-length="2"
-        data-ship-type="PatrolBoat"
-        @click="turnShip($event, 'PatrolBoat')"
-      >Patrol Boat</div>
+      <div class="gridFlex">
+        <div class="flexJustify" v-if="this.myLocations.length == 0">
+          <!--ships-->
+          <div class="flexShips">
+            <h3 v-if="shipTypes.length < 1" class="white--text">Drag your ships into the GRID!</h3>
+            <div
+              :class="shipOrientations['Carrier'] ? 'carrierImg' : 'verCarrierImg'"
+              id="Carrier"
+              :draggable="true"
+              @dragstart="dragStart"
+              @dragover.stop
+              data-ship-length="5"
+              data-ship-type="Carrier"
+              class="visibility"
+              @click="turnShip($event, 'Carrier')"
+            ></div>
+            <div
+              :class="
+          shipOrientations['Destroyer'] ? 'destroyerImg' : 'verDestroyerImg'
+        "
+              id="Destroyer"
+              :draggable="true"
+              @dragstart="dragStart"
+              @dragover.stop
+              data-ship-length="3"
+              data-ship-type="Destroyer"
+              class="visibility"
+              @click="turnShip($event, 'Destroyer')"
+            ></div>
 
-      <div
-        :class="shipOrientations['Battleship'] ? 'battleshipImg' : 'verBattleshipImg'"
-        id="Battleship"
-        :draggable="true"
-        @dragstart="dragStart"
-        @dragover.stop
-        data-ship-length="4"
-        data-ship-type="Battleship"
-        @click="turnShip($event, 'Battleship')"
-      >Battleship</div>
-    </div>
-    <div>
-      <div class="inline-block">
-        <div class="flex-grid">
-          <div v-for="num in rows" :key="num" class="grid-colum">{{num}}</div>
+            <div
+              id="Submarine"
+              :class="
+          shipOrientations['Submarine'] ? 'submarineImg' : 'verSubmarineImg'
+        "
+              :draggable="true"
+              @dragstart="dragStart"
+              @dragover.stop
+              data-ship-length="3"
+              data-ship-type="Submarine"
+              class="visibility"
+              @click="turnShip($event, 'Submarine')"
+            ></div>
+
+            <div
+              :class="
+          shipOrientations['PatrolBoat'] ? 'patrolBoatImg' : 'verPatrolBoatImg'
+        "
+              :draggable="true"
+              id="PatrolBoat"
+              @dragstart="dragStart"
+              @dragover.stop
+              data-ship-length="2"
+              data-ship-type="PatrolBoat"
+              class="visibility"
+              @click="turnShip($event, 'PatrolBoat')"
+            ></div>
+
+            <div
+              :class="
+          shipOrientations['Battleship'] ? 'battleshipImg' : 'verBattleshipImg'
+        "
+              id="Battleship"
+              :draggable="true"
+              @dragstart="dragStart"
+              @dragover.stop
+              data-ship-length="4"
+              data-ship-type="Battleship"
+              class="visibility"
+              @click="turnShip($event, 'Battleship')"
+            ></div>
+          </div>
         </div>
         <div
-          v-for="(char ) in cols"
-          :key="char"
-          class="flex-grid"
-          @dragover.prevent
-          @drop.prevent="drop"
-          :id="id"
+          class="inline-block"
+          :class="this.myLocations.length == 0 ? 'borderGridGlow': 'borderGrid' "
         >
-          <div v-for="(num, index) in rows" :key="char+num" class="grid-row" :id="char+num">
-            <span v-if="index == 0">{{char}}</span>
+          <div class="flex-grid">
+            <div v-for="num in rows" :key="num" class="grid-colum">{{ num }}</div>
           </div>
-        </div>
-      </div>
-
-      <div>
-        <h4>Shots</h4>
-        <button @click="sendSalvos">Shot!</button>
-        <div class="flex-grid">
-          <div v-for="num in rows" :key="num" class="grid-colum">{{num}}</div>
-        </div>
-        <div v-for="character in cols" :key="character" class="flex-grid">
           <div
-            v-for="number in rows"
-            :key="character+number"
-            class="grid-row"
-            :id="character + number +'s'"
-            @click="putSalvos(character + number)"
+            v-for="char in cols"
+            :key="char"
+            class="flex-grid"
+            @dragover.prevent
+            @drop.prevent="drop"
+            :id="id"
           >
-            <span>{{character + number}}</span>
+            <div v-for="(num, index) in rows" :key="char + num" class="grid-row" :id="char + num">
+              <span v-if="index == 0">{{ char }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="flexType opacitySunk">
+          <div v-for="(type, i) in this.shipsToSend" :key="i" :id="type.type + 'sink'"></div>
+        </div>
+        <!-----------------------------enemy's grid------------------------------------------------>
+        <div>
+          <div class="flex-grid">
+            <div v-for="num in rows" :key="num" class="grid-colum">{{ num }}</div>
+          </div>
+          <div v-for="character in cols" :key="character" class="flex-grid">
+            <div
+              v-for="(number, i) in rows"
+              :key="i"
+              class="grid-row"
+              :id="character + number + 's'"
+              @click="putSalvos(character + number)"
+            >
+              <span v-if="i == 0">{{character}}</span>
+            </div>
           </div>
         </div>
       </div>
+      <div v-if="this.myLocations.length == 0" class="flexBtn">
+        <button @click="sendShips">
+          <p :class="shipTypes.length == 5 ? 'btnSend' : ''" v-if="shipTypes.length == 5">Send Ships</p>
+        </button>
+      </div>
+      <div v-else class="flexBtn">
+        <button @click="sendSalvos">
+          <p :class="salvosToSend.length == 5 ? 'btnSend' : 'btnSend1'">Shot!</p>
+        </button>
+      </div>
+      <div></div>
     </div>
-  </div>
+    <div v-else>Loading game..</div>
+  </v-app>
 </template>
 
 <script>
@@ -130,11 +207,17 @@ export default {
   components: {},
   data() {
     return {
+      dialogDrop: false,
+      dialogTurn: false,
+      dialogTurnOnShip: false,
+      dialogSalvo: false,
+      dialogSalvoGrid: false,
+      dialogDrag: false,
       counter: 0,
       myLocations: [],
       opponentLoc: [],
       myShots: [],
-      rows: ["", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      rows: ["", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], //makes the grid
       cols: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
       salvosToSend: [],
       shipsToSend: [
@@ -158,21 +241,50 @@ export default {
           type: "Battleship",
           location: []
         }
-      ],
-      //make all variables from drop function to general
+      ], //receives the loc and sends the ships to the backend
+
       shipOrientations: {
         Carrier: true,
         Destroyer: true,
         PatrolBoat: true,
         Submarine: true,
         Battleship: true
-      }
+      }, //determines horizontal (true) or vertical (false)
+      shipTypes: [] //this stores the ship types, only for css reasons
     };
   },
   watch: {
+    dialogDrop(val) {
+      if (!val) return;
+
+      setTimeout(() => (this.dialogDrop = false), 1000);
+    },
+    dialogTurn(val) {
+      if (!val) return;
+      setTimeout(() => (this.dialogTurn = false), 1000);
+    },
+    dialogTurnOnShip(val) {
+      if (!val) return;
+      setTimeout(() => (this.dialogTurnOnShip = false), 1000);
+    },
+    dialogSalvo(val) {
+      if (!val) return;
+      setTimeout(() => (this.dialogSalvo = false), 1000);
+    },
+    dialogSalvoGrid(val) {
+      if (!val) return;
+      setTimeout(() => (this.dialogSalvoGrid = false), 1500);
+    },
+    dialogDrag(val) {
+      if (!val) return;
+
+      setTimeout(() => (this.dialogDrag = false), 2000);
+    },
+
     getGameView() {
       setTimeout(() => {
         //my ships locations
+        this.myLocations = [];
         for (let i = 0; i < this.getGameView.Ship.length; i++) {
           let shipLocation = this.getGameView.Ship[i].Locations;
           let shipType = this.getGameView.Ship[i].Type;
@@ -180,7 +292,7 @@ export default {
           for (let j = 0; j < shipLocation.length; j++) {
             document
               .getElementById(shipLocation[j]) //this location is equal to the num+char id
-              .classList.add(shipType.replace(/\s/g, "")); //
+              .classList.add(shipType.replace(/\s/g, ""));
             this.myLocations.push(shipLocation[j]);
           }
         }
@@ -207,37 +319,40 @@ export default {
           }
         }
         //opponent shots
+        if (this.getGameView.oppSalvo != null) {
+          for (let k = 0; k < this.getGameView.oppSalvo.length; k++) {
+            let oppSalvo = this.getGameView.oppSalvo[k].Location;
 
-        for (let k = 0; k < this.getGameView.oppSalvo.length; k++) {
-          let oppSalvo = this.getGameView.oppSalvo[k].Location;
-
-          for (let j = 0; j < oppSalvo.length; j++) {
-            document.getElementById(oppSalvo[j]).classList.add("oppShots");
-            this.opponentLoc.push(oppSalvo[j]);
-          }
-        }
-
-        //hits by opponent
-        for (let i = 0; i < this.myLocations.length; i++) {
-          for (let j = 0; j < this.opponentLoc.length; j++) {
-            if (this.myLocations[i] == this.opponentLoc[j]) {
-              document
-                .getElementById(this.opponentLoc[j])
-                .classList.add("hits");
+            for (let j = 0; j < oppSalvo.length; j++) {
+              document.getElementById(oppSalvo[j]).classList.add("oppShots");
+              this.opponentLoc.push(oppSalvo[j]);
             }
           }
-        }
 
-        //cross out ship name if the ship is sunk
-        for (let i = 0; i < this.getGameView.sunkShips.sunk.length; i++) {
-          let sunk = this.getGameView.sunkShips.sunk[i].replace(/\s/g, "");
+          //hits by opponent
+          for (let i = 0; i < this.myLocations.length; i++) {
+            for (let j = 0; j < this.opponentLoc.length; j++) {
+              if (this.myLocations[i] == this.opponentLoc[j]) {
+                document
+                  .getElementById(this.opponentLoc[j])
+                  .classList.add("hits");
+              }
+            }
+          }
 
-          let keys = Object.keys(this.shipOrientations);
-          for (let j = 0; j < keys.length; j++) {
-            let ships = keys[j];
+          //cross out ship name if the ship is sunk
+          for (let i = 0; i < this.getGameView.sunkShips.sunk.length; i++) {
+            let sunk = this.getGameView.sunkShips.sunk[i].replace(/\s/g, "");
 
-            if (sunk == ships) {
-              document.getElementById(sunk + "sink").classList.add("crossOut");
+            let keys = Object.keys(this.shipOrientations);
+            for (let j = 0; j < keys.length; j++) {
+              let ships = keys[j];
+
+              if (sunk == ships) {
+                document
+                  .getElementById(sunk + "sink")
+                  .classList.add(sunk + "Broken");
+              }
             }
           }
         }
@@ -245,50 +360,67 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["actShips", "actSalvos"]),
+    ...mapActions(["actShips", "actSalvos", "actGames"]),
     sendShips() {
-      return this.$store.dispatch("actShips", {
+      this.$store.dispatch("actShips", {
         gpId: this.gpId,
         ships: this.shipsToSend
       });
+      this.shipTypes = [];
     },
 
     sendSalvos() {
-      return this.$store.dispatch("actSalvos", {
+      this.$store.dispatch("actSalvos", {
         gpId: this.gpId,
         salvos: this.salvosToSend
       });
+      this.salvosToSend.forEach(salvo => {
+        document.getElementById(salvo + "s").classList.remove("shotsDone");
+      });
+      this.salvosToSend = [];
     },
 
     //drag and drop
     dragStart(e) {
-      console.log("dragstart");
-      let target = e.target;
-      e.dataTransfer.setData("ship_id", target.id);
+      if (this.myLocations.length == 0) {
+        let target = e.target;
+        document.getElementById(target.id).classList.remove("visibility");
 
-      this.counter = 0;
+        e.dataTransfer.setData("ship_id", target.id);
+        this.counter = 0;
+      } else {
+        console.log("can't drag anymore");
+
+        this.dialogDrag = true;
+      }
     },
     drop(e) {
-      console.log("drop");
-
       let grid = e.target;
       let shipId = e.dataTransfer.getData("ship_id"); //Carrier, Destroyer...
       let ship = document.getElementById(shipId);
+      document.getElementById(shipId).classList.add("visibility");
+      let prevLoc = [];
+      this.shipsToSend.forEach(shipSend => {
+        if (shipSend.type == shipId) {
+          prevLoc = shipSend.location;
+          shipSend.location = [];
+        }
+      });
 
-      // this.shipsToSend.forEach(ship => {
-      //   if (ship.type == shipId) {
-      //     ship.location = [];
-      //   }
-      // });
       if (this.checkFree(shipId, grid)) {
         this.shipConditions(shipId, grid);
       } else {
+        this.shipsToSend.find(
+          shipSend => shipSend.type == shipId
+        ).location = prevLoc;
         console.log("can't drop here");
       }
     },
     turnShip(event, name) {
+      //turning ship
       this.counter = 1;
       let grid = event.target.offsetParent;
+
       let gridId = event.target.offsetParent.id; //A5
       let shipId = event.target.id; //CARRIER
       let ship = document.getElementById(shipId);
@@ -297,7 +429,6 @@ export default {
       let num = Number(gridId.substring(1));
       let char = gridId.substring(0, 1);
 
-      console.log("draw");
       if (
         (Number(shipLen) + num < 12 && !this.shipOrientations[name]) ||
         (Number(shipLen) + char.charCodeAt(0) < 76 &&
@@ -308,32 +439,35 @@ export default {
           this.shipConditions(shipId, grid);
         } else {
           this.shipOrientations[name] = !this.shipOrientations[name];
-          console.log("can't turn here");
+          this.dialogTurnOnShip = true;
         }
       } else {
-        console.log("can't turn around here");
+        this.dialogTurn = true;
       }
     },
     shipLocation(shipId, grid) {
-      console.log("location");
+      //location of the ships
 
       let ship = document.getElementById(shipId);
 
       let char = grid.id.substring(0, 1); //this is A from A10
       let num = Number(grid.id.substring(1)); //this is 10 from A10
-
       let newShipLoc = [];
 
       if (this.shipOrientations[ship.dataset.shipType]) {
-        console.log("orientation horizontal");
+        //horizontal
         for (let i = 0; i < ship.dataset.shipLength; i++) {
           newShipLoc.push(char + (num + i));
         }
       } else {
-        console.log("orientation vertical");
+        //vertical
         for (let i = 0; i < ship.dataset.shipLength; i++) {
           newShipLoc.push(String.fromCharCode(char.charCodeAt(0) + i) + num);
         }
+      }
+      if (!this.shipTypes.includes(shipId)) {
+        this.shipTypes.push(ship.dataset.shipType);
+        console.log(this.shipTypes);
       }
 
       this.shipsToSend.forEach(sendShip => {
@@ -343,7 +477,7 @@ export default {
       });
     },
     shipConditions(shipId, grid) {
-      console.log("conditions");
+      //conditions (can't go out of grid)
 
       let ship = document.getElementById(shipId);
       let shipLen = ship.dataset.shipLength;
@@ -370,10 +504,11 @@ export default {
         grid.appendChild(ship);
         this.shipLocation(shipId, grid);
       } else {
-        console.log("can't place the ship there fucking cheater");
+        this.dialogDrop = true;
       }
     },
     checkFree(shipId, grid) {
+      //check if there's another ship already positioned
       let ship = document.getElementById(shipId);
       let typeShip = ship.dataset.shipType;
       let shipLen = ship.dataset.shipLength;
@@ -385,7 +520,6 @@ export default {
         if (this.shipOrientations[typeShip]) {
           this.shipsToSend.forEach(shipSend => {
             if (shipSend.location.includes(char + (num + i))) {
-              console.log("can't place");
               equalizer = false;
             }
           });
@@ -396,7 +530,6 @@ export default {
                 String.fromCharCode(char.charCodeAt(0) + i) + num
               )
             ) {
-              console.log("can't place");
               equalizer = false;
             }
           });
@@ -419,58 +552,163 @@ export default {
               document.getElementById(cell + "s").classList.add("shotsDone");
               this.salvosToSend.push(cell);
             } else {
-              console.log("can't put anymore ships");
+              this.dialogSalvo = true;
             }
           }
         }
       } else {
-        console.log("can't shoot outside of the grid");
+        this.dialogSalvoGrid = true;
       }
     }
   },
   computed: {
-    ...mapGetters(["getGameView", "getShips"]),
-    changepos() {
-      return this.shipOrientations;
-    }
+    ...mapGetters(["getGameView", "getShips", "getGames"])
   },
-  created() {}
+  created() {
+    this.actGames();
+  }
 };
 </script>
 
 <style scoped>
+.height,
+.wholeHeight {
+  height: 100%;
+}
+.bckImg {
+  background-image: url("https://s2.best-wallpaper.net/wallpaper/3840x2160/1703/Sea-wave-foam_3840x2160.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/*v-toolbar*/
+.v-toolbar__title {
+  width: 100%;
+}
+.theme--light.v-toolbar.v-sheet {
+  background: linear-gradient(-45deg, #abc9e9, #4c6a97, #182a42, #01010c);
+  animation: gradient 2s ease infinite;
+}
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.navBck {
+  background: linear-gradient(-34deg, #abc9e9, #4c6a97, #182a42, #01010c);
+  border: 0.5px solid black;
+  border-right: none;
+  border-left: none;
+}
+.flexWidth,
+.flexPad {
+  display: flex;
+  width: inherit;
+}
+.iconFlex {
+  width: 10%;
+  display: flex;
+  justify-content: center;
+}
+.youVsOpp {
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+}
+.flexState {
+  width: 40%;
+  display: flex;
+}
+.stateGame {
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-transform: capitalize;
+}
+/*alert*/
+.v-dialog > .v-card > .v-card__text {
+  padding: 10px 0px !important;
+}
+/*ships*/
+.flexShips {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+/*grid*/
+
 .inline-block {
   display: inline-block;
+}
+.borderGrid {
+  border: 2px solid grey;
+}
+.borderGridGlow {
+  border: 2px solid black;
+  animation: glowing 1300ms infinite;
+}
+@keyframes glowing {
+  0% {
+    border-color: black;
+    box-shadow: 0 0 5px black;
+  }
+  50% {
+    border-color: grey;
+    box-shadow: 0 0 20px grey;
+  }
+  100% {
+    border-color: black;
+    box-shadow: 0 0 5px black;
+  }
 }
 .flex-grid {
   display: flex;
 }
-.flexJustify {
+.flexType {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.flexJustify,
+.gridFlex {
   display: flex;
   justify-content: space-evenly;
 }
+.gridFlex {
+  padding-top: 30px;
+}
 .grid-colum {
   display: inline-grid;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.3);
   border: 1px solid rgba(0, 0, 0, 0.8);
   padding: 10px;
   font-size: 15px;
   text-align: center;
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
 }
 
 .grid-row {
   display: inline-grid;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.3);
   border: 1px solid rgba(0, 0, 0, 0.8);
-  padding: 10px;
+  padding: 7px;
 
-  width: 20px;
+  width: 40px;
   position: relative;
 }
+/*paint background color of the grid*/
 .Destroyer {
   background: chocolate;
 }
@@ -507,69 +745,151 @@ export default {
 .sunkShip {
   background: black;
 }
+/*images of the ships*/
+.opacitySunk {
+  background-color: #ffffff6b;
+
+  border: 2px solid grey;
+}
 .carrierImg {
-  width: 208px;
+  width: 198px;
   height: 38px;
-  z-index: 1;
-  background-color: green;
+  background-image: url("../assets/carrierHor.png");
 }
 .verCarrierImg {
-  z-index: 1;
-  height: 200px;
-  width: 40.5px;
-  background-color: green;
+  height: 227px;
+  width: 38px;
+  background-image: url("../assets/carrierVer.png");
+
   top: 0;
+}
+.CarrierBroken {
+  width: 190px;
+  height: 38px;
+  background-image: url("../assets/carrierBroken.png");
 }
 .destroyerImg {
-  width: 124px;
-  height: 38px;
-  z-index: 1;
-  background-color: gray;
+  width: 118px;
+  height: 39px;
+  background-image: url("../assets/destroyerHor.png");
+  /* background-color: gray; */
 }
 .verDestroyerImg {
-  z-index: 1;
+  width: 38px;
   height: 120px;
-  width: 40.5px;
-  background-color: gray;
+  background-image: url("../assets/destroyerVer.png");
+  /* background-color: gray; */
   top: 0;
+}
+.DestroyerBroken {
+  width: 56%;
+  height: 39px;
+  background-image: url("../assets/destroyerBroken.png");
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 .submarineImg {
-  width: 124px;
-  height: 38px;
-  z-index: 1;
-  background-color: yellow;
+  width: 118px;
+  height: 39px;
+  background-image: url("../assets/submarineHor.png");
+  /* background-color: yellow; */
 }
 .verSubmarineImg {
-  z-index: 1;
   height: 120px;
-  width: 40.5px;
-  background-color: yellow;
+  width: 38px;
+  background-image: url("../assets/submarineVer.png");
+  /* background-color: yellow; */
   top: 0;
+}
+.SubmarineBroken {
+  width: 118px;
+  height: 39px;
+  background-image: url("../assets/submarineBroken.png");
+  margin-left: auto;
+  margin-right: auto;
 }
 .patrolBoatImg {
-  width: 82px;
-  height: 38px;
-  z-index: 1;
-  background-color: orange;
+  width: 78px;
+  height: 40px;
+  background-image: url("../assets/patrolBoatHor.png");
+  /* background-color: orange; */
 }
 .verPatrolBoatImg {
-  z-index: 1;
   height: 80px;
-  width: 40.5px;
-  background-color: orange;
+  width: 38px;
+  background-image: url("../assets/patrolBoatVer.png");
+  /* background-color: orange; */
   top: 0;
+}
+.PatrolBoatBroken {
+  width: 78px;
+  height: 40px;
+  background-image: url("../assets/patrolBoatBroken.png");
+  margin-left: auto;
+  margin-right: auto;
 }
 .battleshipImg {
-  width: 166px;
-  height: 38px;
-  z-index: 1;
-  background-color: cyan;
+  width: 158px;
+  height: 40px;
+  background-image: url("../assets/battleshipHor.png");
+  /* background-color: cyan; */
 }
 .verBattleshipImg {
-  z-index: 1;
   height: 160px;
-  width: 40.5px;
-  background-color: cyan;
+  width: 38px;
+  background-image: url("../assets/battleshipVer.png");
+  /* background-color: cyan; */
   top: 0;
+}
+.BattleshipBroken {
+  width: 158px;
+  height: 40px;
+  background-image: url("../assets/battleshipBroken.png");
+  margin-left: auto;
+  margin-right: auto;
+}
+/*transform to z-index when draggingand dropping*/
+.visibility {
+  z-index: 1;
+}
+/*sendship and salvos*/
+.flexBtn {
+  display: flex;
+  justify-content: center;
+  height: 26.5%;
+}
+.btnSend1 {
+  margin: 0 auto;
+  width: 150px;
+  padding: 20px;
+  background: tomato;
+  border-radius: 15px;
+}
+.btnSend {
+  margin: 0 auto;
+  width: 150px;
+  padding: 20px;
+  background: tomato;
+  animation: mymove 0.75s infinite;
+  border-radius: 15px;
+}
+
+@keyframes mymove {
+  0% {
+    transform: scale(1, 1) translate(0px, 0px);
+  }
+
+  30% {
+    transform: scale(1, 0.9) translate(0px, 5px);
+  }
+
+  75% {
+    transform: scale(1, 1.1) translate(0px, -10px);
+  }
+
+  100% {
+    transform: scale(1, 1) translate(0px, 0px);
+  }
 }
 </style>
