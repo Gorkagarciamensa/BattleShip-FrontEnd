@@ -1,5 +1,5 @@
 # battleship_game
-
+[![Netlify Status](https://api.netlify.com/api/v1/badges/9bd247f0-f999-4d49-96c1-ded9839682fe/deploy-status)](https://app.netlify.com/sites/battleshipgorka/deploys)
 ## Project setup
 ```
 npm install

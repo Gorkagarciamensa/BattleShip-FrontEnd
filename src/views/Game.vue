@@ -78,7 +78,7 @@ export default {
     this.actGameView(this.id);
     this.fetching = setInterval(() => {
       this.actGameView(this.id);
-    }, 15000);
+    }, 5000);
   }
 };
 </script>

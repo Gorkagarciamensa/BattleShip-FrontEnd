@@ -1,16 +1,62 @@
 <template>
-  <div>
+  <div v-if="getGames">
     <v-app>
-      <v-form v-model="valid">
+      <div class="bckImg">
+        <v-row justify="center">
+          <v-col cols="12" sm="10" md="8" lg="6">
+            <v-card ref="form">
+              <v-card-text>
+                <v-text-field
+                  label="Name"
+                  placeholder="Name"
+                  required
+                  v-model="name"
+                  :rules="nameRules"
+                ></v-text-field>
+                <v-text-field
+                  label="Password"
+                  required
+                  placeholder="Password"
+                  v-model="pwd"
+                  :rules="passwordRules"
+                  type="password"
+                ></v-text-field>
+              </v-card-text>
+              <v-divider class="mt-12"></v-divider>
+              <v-card-actions>
+                <router-link :to="'/'">
+                  <v-icon>fas fa-arrow-alt-circle-left</v-icon>
+                </router-link>
+                <v-spacer></v-spacer>
+                <div>
+                  <h5>
+                    Don't have an account?
+                    <router-link :to="'/Register'">Register</router-link>
+                  </h5>
+                </div>
+                <v-spacer></v-spacer>
+
+                <v-btn @click="loginIn" v-if="getGames.player == null">Login</v-btn>
+                <v-btn @click="logOut" v-else>Logout</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+      </div>
+    </v-app>
+  </div>
+
+  <!-- <v-dialog v-model="dialogCantLogin" hide-overlay persistent width="300">
+        <v-card color="primary" dark>
+          <v-card-text class="text-center px-1">Put a valid username and password</v-card-text>
+        </v-card>
+  </v-dialog>-->
+
+  <!-- <v-form v-model="valid">
         <v-container>
           <v-row>
             <v-col cols="12" md="4">
-              <v-text-field
-                v-model="name"
-                :rules="nameRules"
-                label="Username"
-                required
-              ></v-text-field>
+              <v-text-field v-model="name" :rules="nameRules" label="Username" required></v-text-field>
             </v-col>
             <v-col cols="12" md="4">
               <v-text-field
@@ -22,33 +68,12 @@
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="4">
-              <v-btn @click="loginIn" v-if="getGames.player == null"
-                >Login</v-btn
-              >
+              <v-btn @click="loginIn" v-if="getGames.player == null">Login</v-btn>
               <v-btn @click="logOut" v-else>Logout</v-btn>
             </v-col>
           </v-row>
         </v-container>
-      </v-form> </v-app
-    >Login Page
-    <form
-      id="login-form"
-      onsubmit="return false"
-      v-if="getGames.player == null"
-    >
-      <input type="text" value="username" v-model="name" />
-
-      <input type="text" value="password" v-model="pwd" />
-
-      <button @click="loginIn">Login</button>
-    </form>
-    <form id="logout-form" onsubmit="return false" v-else>
-      <button @click="logOut">Logout</button>
-    </form>
-    <router-link :to="'/#'">
-      <button>Back to main page</button>
-    </router-link>
-  </div>
+  </v-form>-->
 </template>
 
 <script>
@@ -61,8 +86,16 @@ export default {
       name: "",
       pwd: "",
       nameRules: [v => !!v || "Name is required"],
-      passwordRules: [v => !!v || "Password is required"]
+      passwordRules: [v => !!v || "Password is required"],
+      dialogCantLogin: false
     };
+  },
+  watch: {
+    dialogDrop(val) {
+      if (!val) return;
+
+      setTimeout(() => (this.dialogCantLogin = false), 2000);
+    }
   },
   methods: {
     ...mapActions(["actLogin", "actLogout", "actGames"]),
@@ -78,11 +111,32 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getGames"])
+    ...mapGetters(["getGames", "getErrorMsg"])
   },
 
-  created() {}
+  created() {
+    this.actGames();
+  }
 };
 </script>
 
-<style></style>
+<style scoped>
+.bckImg {
+  background-image: url("https://i.pinimg.com/originals/81/8f/d8/818fd868de4ce53e00376c796f6aa8dd.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 100%;
+}
+.row {
+  justify-content: center;
+  padding-top: 15%;
+}
+a {
+  text-decoration: none;
+  padding-left: 20px;
+  color: #6767e6;
+}
+a:hover {
+  color: #33ec43;
+}
+</style>

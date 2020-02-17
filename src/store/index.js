@@ -9,13 +9,15 @@ export default new Vuex.Store({
     games: null,
     gameView: [],
     ladderBoard: [],
-    gameViewError: ""
+    gameViewError: "",
+    errorMsg: null
   },
   mutations: {
     get_games: (state, payload) => (state.games = payload),
     get_gameView: (state, payload) => (state.gameView = payload),
     get_gameViewError: (state, payload) => (state.gameViewError = payload),
-    get_board: (state, payload) => (state.ladderBoard = payload)
+    get_board: (state, payload) => (state.ladderBoard = payload),
+    get_errorMsg: (state, payload) => (state.errorMsg = payload)
   },
   actions: {
     //games
@@ -96,6 +98,10 @@ export default new Vuex.Store({
           console.log("Request success: ", data);
           if (data.status == 200) {
             router.push("/");
+          } else {
+            console.log(data);
+
+            commit("get_errorMsg", data.ok);
           }
         })
         .catch(function(error) {
@@ -290,6 +296,7 @@ export default new Vuex.Store({
   getters: {
     getGames: state => state.games,
     getGameView: state => state.gameView,
-    getBoard: state => state.ladderBoard
+    getBoard: state => state.ladderBoard,
+    getErrorMsg: state => state.errorMsg
   }
 });

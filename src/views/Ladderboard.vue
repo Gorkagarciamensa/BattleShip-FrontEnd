@@ -1,12 +1,22 @@
 <template>
   <div>
-    <table>
+    <v-simple-table fixed-header height="621.5px">
       <tr>
-        <th>Player</th>
-        <th>Win</th>
-        <th>Loses</th>
-        <th>Tie</th>
-        <th>Total Score</th>
+        <th>
+          <p>Player</p>
+        </th>
+        <th>
+          <p>Win</p>
+        </th>
+        <th>
+          <p>Loses</p>
+        </th>
+        <th>
+          <p>Tie</p>
+        </th>
+        <th>
+          <p>Total Score</p>
+        </th>
       </tr>
       <tr v-for="(player, i) in getLadderboard" :key="i">
         <td id="playerBoard">{{player.name}}</td>
@@ -15,7 +25,7 @@
         <td>{{player.tie}}</td>
         <td>{{player.points}}</td>
       </tr>
-    </table>
+    </v-simple-table>
   </div>
 </template>
 
@@ -72,9 +82,35 @@ export default {
   },
   created() {
     this.actLadderboard();
+    setInterval(() => {
+      this.actLadderboard();
+    }, 15000);
   }
 };
 </script>
 
-<style>
+<style scoped>
+td,
+th {
+  border: 1px solid #dddddd;
+  padding: 8px;
+}
+
+tr:nth-child(odd) {
+  background-color: #dddddd;
+}
+td,
+tr {
+  text-align: center;
+}
+.marginTable {
+  margin: 0px 130px;
+}
+
+.opacity {
+  opacity: 0.9;
+}
+.opacity:hover {
+  opacity: 1;
+}
 </style>

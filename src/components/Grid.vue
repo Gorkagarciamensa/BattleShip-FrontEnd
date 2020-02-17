@@ -62,6 +62,11 @@
           <v-card-text class="text-center px-1">Can't drag after you sent the ships</v-card-text>
         </v-card>
       </v-dialog>
+      <v-dialog v-model="dialogDropOnShip" hide-overlay persistent width="300">
+        <v-card color="primary" dark>
+          <v-card-text class="text-center px-1">Are you crazy? Wanna collapse them ships?</v-card-text>
+        </v-card>
+      </v-dialog>
       <!------------------------------my grid---------------------------------------------------->
 
       <div class="gridFlex">
@@ -178,17 +183,28 @@
           </div>
         </div>
       </div>
-      <div v-if="this.myLocations.length == 0" class="flexBtn">
-        <button @click="sendShips">
-          <p :class="shipTypes.length == 5 ? 'btnSend' : ''" v-if="shipTypes.length == 5">Send Ships</p>
-        </button>
+      <div class="logicText"
+        v-if="(getGameView.State.Logic == 'DEFEAT') || (getGameView.State.Logic == 'VICTORY') || getGameView.State.Logic == 'DRAW' "
+      >
+      {{getGameView.State.Logic}}
       </div>
-      <div v-else class="flexBtn">
-        <button @click="sendSalvos">
-          <p :class="salvosToSend.length == 5 ? 'btnSend' : 'btnSend1'">Shot!</p>
-        </button>
+      <div v-else>
+        <div v-if="this.myLocations.length == 0" class="flexBtn">
+          <button @click="sendShips">
+            <p
+              :class="shipTypes.length == 5 ? 'btnSend' : ''"
+              v-if="shipTypes.length == 5"
+            >Send Ships</p>
+          </button>
+        </div>
+        <div v-else class="flexBtn">
+          <button @click="sendSalvos">
+            <p :class="salvosToSend.length == 5 ? 'btnSend' : 'btnSend1'">Shot!</p>
+          </button>
+        </div>
+        </div>
       </div>
-      <div></div>
+     
     </div>
     <div v-else>Loading game..</div>
   </v-app>
@@ -207,6 +223,7 @@ export default {
   components: {},
   data() {
     return {
+      dialogDropOnShip: false,
       dialogDrop: false,
       dialogTurn: false,
       dialogTurnOnShip: false,
@@ -279,6 +296,11 @@ export default {
       if (!val) return;
 
       setTimeout(() => (this.dialogDrag = false), 2000);
+    },
+     dialogDropOnShip(val) {
+      if (!val) return;
+
+      setTimeout(() => (this.dialogDropOnShip = false), 2000);
     },
 
     getGameView() {
@@ -413,6 +435,7 @@ export default {
         this.shipsToSend.find(
           shipSend => shipSend.type == shipId
         ).location = prevLoc;
+        this.dialogDropOnShip = true;
         console.log("can't drop here");
       }
     },
@@ -582,6 +605,9 @@ export default {
 }
 
 /*v-toolbar*/
+a {
+  text-decoration: none;
+}
 .v-toolbar__title {
   width: 100%;
 }
@@ -782,7 +808,7 @@ export default {
   top: 0;
 }
 .DestroyerBroken {
-  width: 56%;
+  width: 75%;
   height: 39px;
   background-image: url("../assets/destroyerBroken.png");
   margin-left: auto;
@@ -891,5 +917,12 @@ export default {
   100% {
     transform: scale(1, 1) translate(0px, 0px);
   }
+  
+}
+.logicText{
+    height: 100%;
+    text-align: center;
+    padding-top: 50px;
+    font-size: 50px;
 }
 </style>
