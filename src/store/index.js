@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import router from "../router/index.js";
-const url = "http://arcane-spire-49060.herokuapp.com";
+const url = "https://arcane-spire-49060.herokuapp.com";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
