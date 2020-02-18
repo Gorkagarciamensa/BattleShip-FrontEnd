@@ -66,7 +66,6 @@ export default {
           }
         });
         ladderboard.push(playerScore);
-        console.log(ladderboard);
       });
 
       return ladderboard.sort((a, b) => {

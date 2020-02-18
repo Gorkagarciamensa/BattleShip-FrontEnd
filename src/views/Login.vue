@@ -45,35 +45,6 @@
       </div>
     </v-app>
   </div>
-
-  <!-- <v-dialog v-model="dialogCantLogin" hide-overlay persistent width="300">
-        <v-card color="primary" dark>
-          <v-card-text class="text-center px-1">Put a valid username and password</v-card-text>
-        </v-card>
-  </v-dialog>-->
-
-  <!-- <v-form v-model="valid">
-        <v-container>
-          <v-row>
-            <v-col cols="12" md="4">
-              <v-text-field v-model="name" :rules="nameRules" label="Username" required></v-text-field>
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-text-field
-                v-model="pwd"
-                :rules="passwordRules"
-                label="Password"
-                required
-                type="password"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-btn @click="loginIn" v-if="getGames.player == null">Login</v-btn>
-              <v-btn @click="logOut" v-else>Logout</v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
-  </v-form>-->
 </template>
 
 <script>

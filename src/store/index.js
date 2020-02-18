@@ -1,13 +1,13 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import router from "../router/index.js";
-const url = "https://fierce-fortress-94334.herokuapp.com";
+const url = "http://arcane-spire-49060.herokuapp.com";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     games: null,
-    gameView: [],
+    gameView: null,
     ladderBoard: [],
     gameViewError: "",
     errorMsg: null
@@ -27,7 +27,6 @@ export default new Vuex.Store({
         method: "GET"
       })
         .then(resp => {
-          console.log(resp);
           if (resp.ok) {
             return resp.json();
           }
@@ -35,8 +34,6 @@ export default new Vuex.Store({
         })
         .then(data => {
           context.commit("get_games", data);
-
-          console.log(data);
         })
         .catch(error => {
           console.log(error);
@@ -70,7 +67,6 @@ export default new Vuex.Store({
         method: "GET"
       })
         .then(resp => {
-          console.log(resp);
           if (resp.ok) {
             return resp.json();
           }
@@ -78,7 +74,6 @@ export default new Vuex.Store({
         })
         .then(data => {
           context.commit("get_board", data);
-          console.log(data);
         })
         .catch(error => {
           console.log(error);

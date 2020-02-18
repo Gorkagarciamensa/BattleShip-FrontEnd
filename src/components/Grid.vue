@@ -1,6 +1,6 @@
 <template>
   <v-app class="bckImg">
-    <div v-if="getGameView.length != 0 && getGames" class="wholeHeight">
+    <div v-if="getGameView && getGames" class="wholeHeight">
       <v-toolbar dense class="text-center">
         <v-btn icon>
           <router-link :to="'/'">
@@ -9,10 +9,10 @@
         </v-btn>
 
         <v-toolbar-title>
-          <div>
+          <div class="widthTitle">
             <h4 class="text-capitalize">{{getGameView.State.Logic}}</h4>
           </div>
-          <div>
+          <div class="widthTitle2">
             <h4>Turn: {{getGameView.mySalvo.length}}</h4>
           </div>
         </v-toolbar-title>
@@ -70,7 +70,7 @@
       <!------------------------------my grid---------------------------------------------------->
 
       <div class="gridFlex">
-        <div class="flexJustify" v-if="this.myLocations.length == 0">
+        <div class="flexJustify" v-if="getGameView.Ship.length == 0">
           <!--ships-->
           <div class="flexShips">
             <h3 v-if="shipTypes.length < 1" class="white--text">Drag your ships into the GRID!</h3>
@@ -183,10 +183,11 @@
           </div>
         </div>
       </div>
-      <div class="logicText"
-        v-if="(getGameView.State.Logic == 'DEFEAT') || (getGameView.State.Logic == 'VICTORY') || getGameView.State.Logic == 'DRAW' "
+      <div
+        class="logicText"
+        v-if="(getGameView.State.Logic == 'DEFEAT') || (getGameView.State.Logic == 'VICTORY') || (getGameView.State.Logic == 'DRAW') "
       >
-      {{getGameView.State.Logic}}
+        <div :class="getGameView.State.Logic">{{getGameView.State.Logic}}</div>
       </div>
       <div v-else>
         <div v-if="this.myLocations.length == 0" class="flexBtn">
@@ -199,14 +200,16 @@
         </div>
         <div v-else class="flexBtn">
           <button @click="sendSalvos">
-            <p :class="salvosToSend.length == 5 ? 'btnSend' : 'btnSend1'">Shot!</p>
+            <p
+              :class="salvosToSend.length == 5 ? 'btnSend' : 'btnSend1'"
+              v-if="salvosToSend.length == 5"
+            >Shot!</p>
           </button>
         </div>
-        </div>
       </div>
-     
     </div>
-    <div v-else>Loading game..</div>
+
+    <div v-else></div>
   </v-app>
 </template>
 
@@ -223,6 +226,7 @@ export default {
   components: {},
   data() {
     return {
+      fetching: null,
       dialogDropOnShip: false,
       dialogDrop: false,
       dialogTurn: false,
@@ -237,6 +241,7 @@ export default {
       rows: ["", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], //makes the grid
       cols: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
       salvosToSend: [],
+      game: null,
       shipsToSend: [
         {
           type: "Destroyer",
@@ -297,16 +302,28 @@ export default {
 
       setTimeout(() => (this.dialogDrag = false), 2000);
     },
-     dialogDropOnShip(val) {
+    dialogDropOnShip(val) {
       if (!val) return;
 
       setTimeout(() => (this.dialogDropOnShip = false), 2000);
     },
 
     getGameView() {
+      let stateLogic = this.getGameView.State.Logic;
+
+      if (
+        stateLogic == "VICTORY" ||
+        stateLogic == "DEFEAT" ||
+        stateLogic == "DRAW"
+      ) {
+        clearInterval(this.fetching);
+        this.finished = true;
+      }
+
       setTimeout(() => {
         //my ships locations
         this.myLocations = [];
+
         for (let i = 0; i < this.getGameView.Ship.length; i++) {
           let shipLocation = this.getGameView.Ship[i].Locations;
           let shipType = this.getGameView.Ship[i].Type;
@@ -363,6 +380,7 @@ export default {
           }
 
           //cross out ship name if the ship is sunk
+
           for (let i = 0; i < this.getGameView.sunkShips.sunk.length; i++) {
             let sunk = this.getGameView.sunkShips.sunk[i].replace(/\s/g, "");
 
@@ -382,7 +400,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["actShips", "actSalvos", "actGames"]),
+    ...mapActions(["actShips", "actSalvos", "actGames", "actGameView"]),
     sendShips() {
       this.$store.dispatch("actShips", {
         gpId: this.gpId,
@@ -411,12 +429,12 @@ export default {
         e.dataTransfer.setData("ship_id", target.id);
         this.counter = 0;
       } else {
-        console.log("can't drag anymore");
-
         this.dialogDrag = true;
       }
     },
     drop(e) {
+      console.log(this.gpId);
+
       let grid = e.target;
       let shipId = e.dataTransfer.getData("ship_id"); //Carrier, Destroyer...
       let ship = document.getElementById(shipId);
@@ -436,7 +454,6 @@ export default {
           shipSend => shipSend.type == shipId
         ).location = prevLoc;
         this.dialogDropOnShip = true;
-        console.log("can't drop here");
       }
     },
     turnShip(event, name) {
@@ -490,7 +507,6 @@ export default {
       }
       if (!this.shipTypes.includes(shipId)) {
         this.shipTypes.push(ship.dataset.shipType);
-        console.log(this.shipTypes);
       }
 
       this.shipsToSend.forEach(sendShip => {
@@ -565,7 +581,6 @@ export default {
     putSalvos(cell) {
       if (document.getElementById(cell + "s").id.length > 2) {
         if (document.getElementById(cell + "s").classList.contains("myShots")) {
-          console.log("can't shot where you shotted!");
         } else {
           if (this.salvosToSend.includes(cell)) {
             document.getElementById(cell + "s").classList.remove("shotsDone");
@@ -589,11 +604,19 @@ export default {
   },
   created() {
     this.actGames();
+    this.actGameView(this.gpId);
+    this.fetching = setInterval(() => {
+      this.actGameView(this.gpId);
+    }, 5000);
+  },
+  beforeDestroy() {
+    clearInterval(this.fetching);
   }
 };
 </script>
 
 <style scoped>
+@import url("https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap");
 .height,
 .wholeHeight {
   height: 100%;
@@ -610,6 +633,16 @@ a {
 }
 .v-toolbar__title {
   width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+}
+.widthTitle {
+  width: 67%;
+  text-align: end;
+}
+.widthTitle2 {
+  width: 50%;
+  text-align: end;
 }
 .theme--light.v-toolbar.v-sheet {
   background: linear-gradient(-45deg, #abc9e9, #4c6a97, #182a42, #01010c);
@@ -735,20 +768,15 @@ a {
   position: relative;
 }
 /*paint background color of the grid*/
-.Destroyer {
-  background: chocolate;
-}
-.PatrolBoat {
-  background: red;
-}
-.Submarine {
-  background: yellow;
-}
-.Carrier {
+.Destroyer,
+.PatrolBoat,
+.Submarine,
+.Carrier,
+.Battleship {
   background: green;
 }
-.Battleship {
-  background: brown;
+.patrolBoat {
+  background-image: ;
 }
 .shotsDone {
   background: cyan;
@@ -757,7 +785,7 @@ a {
   background: rgb(0, 0, 0, 0.5);
 }
 .oppShots {
-  background: rgb(126, 243, 126);
+  background: rgb(0, 0, 0, 0.5);
 }
 .oppHits {
   background: rgb(255, 29, 161);
@@ -875,6 +903,7 @@ a {
   margin-left: auto;
   margin-right: auto;
 }
+
 /*transform to z-index when draggingand dropping*/
 .visibility {
   z-index: 1;
@@ -917,12 +946,101 @@ a {
   100% {
     transform: scale(1, 1) translate(0px, 0px);
   }
-  
 }
-.logicText{
-    height: 100%;
-    text-align: center;
-    padding-top: 50px;
-    font-size: 50px;
+.logicText {
+  text-align: center;
+  padding-top: 40px;
+  position: relative;
+}
+.VICTORY {
+  color: green;
+  font-size: 90px;
+  animation: victory 1s ease-in-out;
+  position: absolute;
+  top: 0;
+  left: 31%;
+  font-family: "Press Start 2P", cursive;
+}
+.DEFEAT {
+  color: red;
+  font-size: 90px;
+  animation: defeat 1s ease-in-out;
+  position: absolute;
+  top: 0;
+  left: 33%;
+  font-family: "Press Start 2P", cursive;
+}
+.DRAW {
+  color: rgb(255, 215, 0);
+  font-size: 90px;
+  animation: draw 1s ease-in-out;
+  position: absolute;
+  top: 0;
+  left: 39%;
+  font-family: "Press Start 2P", cursive;
+}
+
+@keyframes victory {
+  0% {
+    left: 0;
+  }
+  20% {
+    left: 45%;
+  }
+  40% {
+    left: 20%;
+  }
+  60% {
+    left: 35%;
+  }
+  80% {
+    left: 25%;
+  }
+
+  100% {
+    left: 31%;
+  }
+}
+@keyframes defeat {
+  0% {
+    left: 0;
+  }
+  20% {
+    left: 45%;
+  }
+  40% {
+    left: 20%;
+  }
+  60% {
+    left: 35%;
+  }
+  80% {
+    left: 25%;
+  }
+
+  100% {
+    left: 33%;
+  }
+}
+@keyframes draw {
+  0% {
+    left: 0;
+  }
+  20% {
+    left: 50%;
+  }
+  40% {
+    left: 30%;
+  }
+  60% {
+    left: 45%;
+  }
+  80% {
+    left: 35%;
+  }
+
+  100% {
+    left: 39%;
+  }
 }
 </style>

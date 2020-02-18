@@ -76,7 +76,7 @@
                           v-if="gameplayer.player.id == getGames.player.id"
                           :to="`/Game/${gameplayer.id}`"
                         >
-                          <v-btn @click="reloadPage">Enter</v-btn>
+                          <v-btn>Enter</v-btn>
                         </router-link>
                         <h5
                           v-else-if="
@@ -100,7 +100,9 @@
         </div>
       </v-container>
     </div>
-    <div v-else>Loading...</div>
+    <div v-else class="bckImgLoad changeColor">
+      <v-progress-circular :size="100" color="white" :width="7" indeterminate></v-progress-circular>
+    </div>
   </div>
 </template>
 
@@ -111,6 +113,9 @@ import Ladderboard from "../views/Ladderboard";
 export default {
   components: {
     Ladderboard
+  },
+  data() {
+    return {};
   },
   methods: {
     ...mapActions(["actGames", "actCreate", "actJoin", "actLogout"]),
@@ -123,11 +128,6 @@ export default {
     logout() {
       this.actLogout();
       location.reload();
-    },
-    reloadPage() {
-      setTimeout(() => {
-        location.reload();
-      }, 150);
     }
   },
   watch: {},
@@ -148,17 +148,39 @@ export default {
 .height100 {
   height: 100%;
 }
+.bckImgLoad {
+  background-image: url("https://s2.best-wallpaper.net/wallpaper/3840x2160/1703/Sea-wave-foam_3840x2160.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 300px;
+}
+.changeColor {
+  color: white;
+  animation: changecolor 2s ease infinite;
+}
+@keyframes changecolor {
+  0% {
+    color: white;
+  }
+  25% {
+    color: rgb(125, 125, 243);
+  }
+  50% {
+    color: rgb(65, 78, 87);
+  }
+  100% {
+    color: black;
+  }
+}
 .bckImg {
   background-image: url("https://s2.best-wallpaper.net/wallpaper/3840x2160/1703/Sea-wave-foam_3840x2160.jpg");
   background-size: cover;
   background-repeat: no-repeat;
 }
-/* .scrollBox {
-  height: 669.5px;
-  text-align: justify;
-  overflow: auto;
-  width: 95%;
-} */
+
 .opacity {
   opacity: 0.9;
 }
