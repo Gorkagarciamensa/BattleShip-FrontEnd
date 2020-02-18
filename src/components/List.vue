@@ -175,11 +175,11 @@ export default {
     color: black;
   }
 }
-.bckImg {
+/* .bckImg {
   background-image: url("https://s2.best-wallpaper.net/wallpaper/3840x2160/1703/Sea-wave-foam_3840x2160.jpg");
   background-size: cover;
   background-repeat: no-repeat;
-}
+} */
 
 .opacity {
   opacity: 0.9;

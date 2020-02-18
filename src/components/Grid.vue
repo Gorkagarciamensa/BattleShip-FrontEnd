@@ -775,9 +775,7 @@ a {
 .Battleship {
   background: green;
 }
-.patrolBoat {
-  background-image: ;
-}
+
 .shotsDone {
   background: cyan;
 }
