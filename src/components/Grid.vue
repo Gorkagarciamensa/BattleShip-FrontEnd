@@ -1,6 +1,6 @@
 <template>
-  <v-app class="bckImg">
-    <div v-if="getGameView && getGames" class="wholeHeight">
+  <v-app>
+    <div v-if="getGameView && getGames" class="wholeHeight bckImg">
       <v-toolbar dense class="text-center">
         <v-btn icon>
           <router-link :to="'/'">
