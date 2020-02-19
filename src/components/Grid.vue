@@ -25,7 +25,9 @@
               <div class="white--text">
                 <h4>{{ getGames.player.username }} (You)</h4>
               </div>
-              <div>VS</div>
+              <div>
+                <h4>VS</h4>
+              </div>
               <div
                 v-if="getGameView.Game.gameplayers.length > 1 && getGames.player.username != getGameView.Game.gameplayers[0].player.username"
               >
@@ -444,8 +446,6 @@ export default {
       }
     },
     drop(e) {
-      console.log(this.gpId);
-
       let grid = e.target;
       let shipId = e.dataTransfer.getData("ship_id"); //Carrier, Destroyer...
       let ship = document.getElementById(shipId);

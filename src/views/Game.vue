@@ -27,50 +27,7 @@ export default {
     ...mapActions(["actGameView"])
   },
   watch: {
-    getGameView() {
-      // let stateLogic = this.getGameView.State.Logic;
-      // console.log(stateLogic);
-      // if (
-      //   stateLogic == "VICTORY" ||
-      //   stateLogic == "DEFEAT" ||
-      //   stateLogic == "DRAW"
-      // ) {
-      //   clearInterval(this.fetching);
-      //   this.finished = true;
-      // }
-      // if (stateLogic == "wait for opponent player to join") {
-      //   console.log("wait for opp");
-      // } else {
-      //   clearInterval(this.fetching);
-      //   if (stateLogic == "place the ships") {
-      //     this.fetching = setInterval(() => {
-      //       this.actGameView(this.id);
-      //     }, 3000);
-      //   } else {
-      //     if (stateLogic == "wait for opponent ships") {
-      //       this.fetching = setInterval(() => {
-      //         this.actGameView(this.id);
-      //       }, 3000);
-      //     } else {
-      //       clearInterval(this.fetching);
-      //       if (
-      //         stateLogic == "you can now shoot" ||
-      //         stateLogic == "wait for opponent to shoot"
-      //       ) {
-      //         this.fetching = setInterval(() => {
-      //           this.actGameView(this.id);
-      //         }, 3000);
-      //       } else if (
-      //         stateLogic == "VICTORY" ||
-      //         stateLogic == "DEFEAT" ||
-      //         stateLogic == "DRAW"
-      //       ) {
-      //         clearInterval(this.fetching);
-      //       }
-      //     }
-      //   }
-      // }
-    }
+    getGameView() {}
   },
   computed: {
     ...mapGetters(["getGameView"])

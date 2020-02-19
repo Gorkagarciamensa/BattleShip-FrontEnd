@@ -89,7 +89,7 @@ th {
   padding: 8px;
 }
 
-tr:nth-child(odd) {
+tr:nth-child(even) {
   background-color: #dddddd;
 }
 td,

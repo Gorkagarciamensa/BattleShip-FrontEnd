@@ -90,12 +90,9 @@ export default new Vuex.Store({
         body: getBody({ name: payload.userName, pwd: payload.password })
       })
         .then(function(data) {
-          console.log("Request success: ", data);
           if (data.status == 200) {
             router.push("/");
           } else {
-            console.log(data);
-
             commit("get_errorMsg", data.ok);
           }
         })
@@ -138,14 +135,12 @@ export default new Vuex.Store({
         body: JSON.stringify(payload)
       })
         .then(newData => {
-          console.log("data sent: ", JSON.stringify(newData));
           return newData.json();
         })
         .then(data => {
           if (data.Error) {
             console.log("register failed ", data);
           } else {
-            console.log("register successful ", data);
             dispatch("actLogin", payload);
           }
         })
@@ -164,14 +159,12 @@ export default new Vuex.Store({
         // body: JSON.stringify(payload)
       })
         .then(newData => {
-          console.log("data sent: ", JSON.stringify(newData));
           return newData.json();
         })
         .then(data => {
           if (data.Error) {
             console.log("error ", data);
           } else {
-            console.log("created: ", data);
             router.push("/Game/" + data.gpid);
           }
         })
@@ -179,34 +172,8 @@ export default new Vuex.Store({
           console.log("Request failure: ", error);
         });
     },
-    // actCreateScore() {
-    //   fetch("/api/ladderBoard", {
-    //     credentials: "include",
-    //     headers: {
-    //       "Content-Type": "application/json"
-    //     },
-    //     method: "POST"
-    //     // body: JSON.stringify(payload)
-    //   })
-    //     .then(newData => {
-    //       console.log("data sent: ", JSON.stringify(newData));
-    //       return newData.json();
-    //     })
-    //     .then(data => {
-    //       if (data.Error) {
-    //         console.log("error ", data);
-    //       } else {
-    //         console.log("created: ", data);
-    //       }
-    //     })
-    //     .catch(error => {
-    //       console.log("Request failure: ", error);
-    //     });
-    // },
     //join game
     actJoin({ commit }, id) {
-      console.log(id);
-
       fetch(url + "/api/game/" + id + "/players", {
         credentials: "include",
         headers: {
@@ -215,7 +182,6 @@ export default new Vuex.Store({
         method: "POST"
       })
         .then(newData => {
-          console.log("data sent: ", JSON.stringify(newData));
           return newData.json();
         })
         .then(data => {
@@ -223,7 +189,6 @@ export default new Vuex.Store({
             //data.Error references the backend
             console.log("error ", data);
           } else {
-            console.log("created: ", data);
             router.push(`/Game/${data.gpid}`);
           }
         })
@@ -242,9 +207,6 @@ export default new Vuex.Store({
         body: JSON.stringify(ships)
       })
         .then(newData => {
-          console.log("data sent: ", JSON.stringify(newData));
-          console.log(ships);
-
           return newData.json();
         })
         .then(data => {
@@ -252,7 +214,6 @@ export default new Vuex.Store({
             //data.Error references the backend
             console.log("error ", data);
           } else {
-            console.log("created: ", data);
             dispatch("actGameView", gpId);
           }
         })
@@ -270,7 +231,6 @@ export default new Vuex.Store({
         body: JSON.stringify(salvos)
       })
         .then(newData => {
-          console.log("data sent: ", JSON.stringify(newData));
           return newData.json();
         })
         .then(data => {
@@ -278,7 +238,6 @@ export default new Vuex.Store({
             //data.Error references the backend
             console.log("error ", data);
           } else {
-            console.log("created: ", data);
             dispatch("actGameView", gpId);
           }
         })
