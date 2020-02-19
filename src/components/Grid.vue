@@ -10,7 +10,7 @@
 
         <v-toolbar-title>
           <div class="widthTitle">
-            <h4 class="text-capitalize">{{getGameView.State.Logic}}</h4>
+            <h4 class="text-capitalize white--text">{{getGameView.State.Logic}}</h4>
           </div>
           <div class="widthTitle2">
             <h4>Turn: {{getGameView.mySalvo.length}}</h4>
@@ -22,12 +22,23 @@
         <div class="flexWidth">
           <div class="flexPad">
             <div class="youVsOpp">
-              <div class="white--text">{{ getGames.player.username }} (You)</div>
+              <div class="white--text">
+                <h4>{{ getGames.player.username }} (You)</h4>
+              </div>
               <div>VS</div>
               <div
-                v-if="getGameView.Game.gameplayers.length > 1"
-              >{{ getGameView.Game.gameplayers[0].player.username }}</div>
-              <div v-else>Waiting for opponent...</div>
+                v-if="getGameView.Game.gameplayers.length > 1 && getGames.player.username != getGameView.Game.gameplayers[0].player.username"
+              >
+                <h4>{{ getGameView.Game.gameplayers[0].player.username }}</h4>
+              </div>
+              <div
+                v-else-if="getGameView.Game.gameplayers.length > 1 && getGames.player.username != getGameView.Game.gameplayers[1].player.username"
+              >
+                <h4>{{ getGameView.Game.gameplayers[1].player.username }}</h4>
+              </div>
+              <div v-else>
+                <h4>Waiting for opponent...</h4>
+              </div>
             </div>
           </div>
         </div>
@@ -626,7 +637,9 @@ export default {
   background-size: cover;
   background-repeat: no-repeat;
 }
-
+h4 {
+  font-family: "Press Start 2P", cursive;
+}
 /*v-toolbar*/
 a {
   text-decoration: none;
@@ -637,7 +650,7 @@ a {
   justify-content: space-evenly;
 }
 .widthTitle {
-  width: 67%;
+  width: 57%;
   text-align: end;
 }
 .widthTitle2 {

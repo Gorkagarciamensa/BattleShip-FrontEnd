@@ -145,8 +145,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+@import url("https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap");
 .height100 {
   height: 100%;
+}
+a {
+  text-decoration: none;
 }
 .bckImgLoad {
   background-image: url("https://s2.best-wallpaper.net/wallpaper/3840x2160/1703/Sea-wave-foam_3840x2160.jpg");

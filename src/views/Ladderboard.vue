@@ -1,30 +1,24 @@
 <template>
   <div>
     <v-simple-table fixed-header height="621.5px">
-      <tr>
-        <th>
-          <p>Player</p>
-        </th>
-        <th>
-          <p>Win</p>
-        </th>
-        <th>
-          <p>Loses</p>
-        </th>
-        <th>
-          <p>Tie</p>
-        </th>
-        <th>
-          <p>Total Score</p>
-        </th>
-      </tr>
-      <tr v-for="(player, i) in getLadderboard" :key="i">
-        <td id="playerBoard">{{player.name}}</td>
-        <td>{{player.win}}</td>
-        <td>{{player.lose}}</td>
-        <td>{{player.tie}}</td>
-        <td>{{player.points}}</td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Win</th>
+          <th>Loses</th>
+          <th>Tie</th>
+          <th>Total Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(player, i) in getLadderboard" :key="i">
+          <td id="playerBoard">{{player.name}}</td>
+          <td>{{player.win}}</td>
+          <td>{{player.lose}}</td>
+          <td>{{player.tie}}</td>
+          <td>{{player.points}}</td>
+        </tr>
+      </tbody>
     </v-simple-table>
   </div>
 </template>
